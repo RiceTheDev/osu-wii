@@ -1,7 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <wiiuse/wpad.h>
 #include <grrlib.h>
+#include "textures.h"
 
 #define GRRLIB_BLACK 0x000000FF
 #define GRRLIB_MAROON 0x800000FF
@@ -29,12 +29,21 @@ int main() {
     GRRLIB_Init();
     WPAD_Init();
 
+    ir_t ir1;
+    WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
+
     while(1) {
+        WPAD_SetVRes(0, 640, 480);
         WPAD_ScanPads();
+        WPAD_IR(WPAD_CHAN_0, &ir1);
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) break;
-
-        GRRLIB_FillScreen(GRRLIB_WHITE);
-
+        
+        GRRLIB_FillScreen(GRRLIB_BLACK);
+        
+        GRRLIB_DrawImg(224, 144, tex_menu_button, 0, 1.5, 1.5, 0xFFFFFFFF);
+        
+        // TODO: load cursor from skin
+        GRRLIB_DrawImg(ir1.sx, ir1.sy, tex_cursor, 0, 1, 1, 0xFFFFFFFF);
         GRRLIB_Render();
     }
 

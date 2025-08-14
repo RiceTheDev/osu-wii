@@ -19,7 +19,7 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	src
 DATA		:=	data
-INCLUDES	:=  lib
+INCLUDES	:=
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -33,12 +33,13 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lgrrlib -lfreetype -lbz2 -lfat -ljpeg -lpngu -lpng -lz -lwiiuse -lbte -logc -lm
+LIBS	:=	-lgrrlib -lpngu `$(PREFIX)pkg-config freetype2 libpng libjpeg --libs` -lfat -lwiiuse -lbte -logc -lm
+
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS)
+LIBDIRS	:= $(CURDIR)/$(GRRLIB) $(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -102,22 +103,12 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol dist $(OUTPUT).zip
+	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
 
 #---------------------------------------------------------------------------------
 run:
-	@wiiload $(TARGET).dol
+	wiiload $(TARGET).dol
 
-#---------------------------------------------------------------------------------
-pack:
-	@rm -rf dist
-	@mkdir -p dist/apps/$(TARGET)
-
-	@cp -r res/* dist/apps/$(TARGET)
-	@cp -r $(TARGET).dol dist/apps/$(TARGET)
-	@mv dist/apps/$(TARGET)/$(TARGET).dol dist/apps/$(TARGET)/boot.dol
-
-	@cd dist; zip -r -9 ../$(TARGET).zip .
 
 #---------------------------------------------------------------------------------
 else
@@ -135,7 +126,31 @@ $(OFILES_SOURCES) : $(HFILES)
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .jpg extension
 #---------------------------------------------------------------------------------
-%.jpg.o	%_jpg.h :	%.jpg
+%.jpg.o	:	%.jpg
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	$(bin2o)
+
+#---------------------------------------------------------------------------------
+# This rule links in binary data with the .png extension
+#---------------------------------------------------------------------------------
+%.png.o	:	%.png
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	$(bin2o)
+
+#---------------------------------------------------------------------------------
+# This rule links in binary data with the .bmp extension
+#---------------------------------------------------------------------------------
+%.bmp.o	:	%.bmp
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	$(bin2o)
+
+#---------------------------------------------------------------------------------
+# This rule links in binary data with the .bmf extension
+#---------------------------------------------------------------------------------
+%.bmf.o	:	%.bmf
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	$(bin2o)

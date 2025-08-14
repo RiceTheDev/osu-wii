@@ -8,5 +8,5 @@ make
 ## Packing for disturbution
 To pack the files into a zip file for disturbution, you must build first. See above for how to do it. Once you have built everything, run the following command:
 ```bash
-make pack
+make pack # Disabled for now!
 ```
